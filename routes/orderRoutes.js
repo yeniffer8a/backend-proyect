@@ -9,7 +9,12 @@ const router = express.Router();
 // function checkJwt() {
 //   expressjwt({ secret: process.env.JWT_SECRET, algorithms: ["HS256"] });
 // }
-router.get("/api/orders/deleted", orderController.getAllOrderDeleted);
+router.get(
+  "/api/orders/deleted",
+  expressjwt({ secret: process.env.JWT_SECRET, algorithms: ["HS256"] }),
+  adminValidation,
+  orderController.getAllOrderDeleted
+);
 router.get(
   "/api/orders",
   expressjwt({ secret: process.env.JWT_SECRET, algorithms: ["HS256"] }),

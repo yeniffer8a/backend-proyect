@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import { validationResult } from "express-validator";
+
 //obtener todos los usuarios
 async function getAllUsers(req, res) {
   try {
@@ -116,6 +117,38 @@ async function deleteUser(req, res) {
     return res.status(500).json({ message: "Internal server error" });
   }
 }
+async function getOwnUser(req, res) {
+  try {
+    const userIdentify = await User.findById(req.auth.id);
+    const userBodyPassword = req.params.password;
+    console.log(
+      "password auth-->",
+      adminIdentify,
+      "password body-->",
+      req.params
+    );
+    const matchPassword = await bcrypt.compare(
+      userIdentify.password,
+      userBodyPassword
+    );
+
+    if (matchPassword) {
+      console.log(
+        "password auth-->",
+        adminIdentify.password,
+        "password body-->",
+        userBodyPassword
+      );
+      const users = await User.find({
+        _id: userIdentify._id,
+        deletedAt: { $eq: null },
+      });
+      return res.status(200).json(users);
+    }
+  } catch (error) {
+    return res.json(error);
+  }
+}
 
 export default {
   getAllUsers,
@@ -123,5 +156,5 @@ export default {
   createUser,
   updateUser,
   deleteUser,
-  // myOrders,
+  getOwnUser,
 };
